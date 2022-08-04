@@ -1,3 +1,5 @@
+from typing import List
+
 from airflow.models import BaseOperator
 from airflow.providers.odbc.hooks.odbc import OdbcHook
 from airflow.utils.context import Context
@@ -21,8 +23,11 @@ class SynapseSQLOperator(BaseOperator):
         self.sql = sql
         self.synapse_sql_conn_id = synapse_sql_conn_id
 
-    def execute(self, context: "Context") -> None:
+    def execute(self, context: "Context") -> List:
         """Using ODBC connection run the sql query on the given server"""
         hook = OdbcHook()
         results = hook.get_records(self.sql)
+        # get_records() returns a list of pyodbc.Row objects
+        results = [tuple(row) for row in results]
         print(results)
+        return results

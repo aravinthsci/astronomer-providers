@@ -8,7 +8,13 @@ RUN apt-get install -y --no-install-recommends \
         libsasl2-2 \
         libsasl2-dev \
         libsasl2-modules \
-        gnupg
+        gnupg \
+        unzip
+
+# install AWS CLI
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install;
 
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 && curl https://packages.microsoft.com/config/debian/11/prod.list >> /etc/apt/sources.list.d/mssql-release.list \
