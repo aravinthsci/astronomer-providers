@@ -7,7 +7,12 @@ RUN apt-get install -y --no-install-recommends \
         build-essential \
         libsasl2-2 \
         libsasl2-dev \
-        libsasl2-modules
+        libsasl2-modules \
+        gnupg
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+&& curl https://packages.microsoft.com/config/debian/11/prod.list >> /etc/apt/sources.list.d/mssql-release.list \
+&& apt update && ACCEPT_EULA=Y apt install -y msodbcsql18
 
 COPY setup.cfg ${AIRFLOW_HOME}/astronomer_providers/setup.cfg
 COPY pyproject.toml ${AIRFLOW_HOME}/astronomer_providers/pyproject.toml
