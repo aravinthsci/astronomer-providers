@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 from typing import List, Optional, Sequence
 
 from airflow.models import BaseOperator
@@ -13,7 +12,6 @@ from azure.mgmt.datafactory.models import (
     CopyActivity,
     DatasetReference,
     PipelineResource,
-    RunFilterParameters,
     SqlDWSink,
 )
 
@@ -108,11 +106,9 @@ class WasbToSynapseOperator(BaseOperator):
             raise AzureDataFactoryPipelineRunException(
                 f"Pipeline run {self.run_id} has failed or has been cancelled."
             )
-        filter_params = RunFilterParameters(
-            last_updated_after=datetime.now() - timedelta(1),
-            last_updated_before=datetime.now() + timedelta(1),
-        )
-        query_response = client.activity_runs.query_by_pipeline_run(
-            self.resource_group_name, self.factory_name, self.run_id, filter_params
-        )
-        print(query_response.value[0])
+        run_status = hook.get_pipeline_run_status(self.run_id, self.resource_group_name, self.factory_name)
+        if run_status != AzureDataFactoryPipelineRunStatus.SUCCEEDED:
+            raise AzureDataFactoryPipelineRunException(
+                f"Pipeline run {self.run_id} has failed or has been cancelled."
+            )
+        self.log.info("Pipeline run %s has completed successfully.", self.run_id)
