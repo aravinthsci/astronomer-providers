@@ -15,7 +15,7 @@ from azure.mgmt.datafactory.models import (
 )
 
 
-class WASBToSynapseOperator(BaseOperator):
+class WasbToSynapseOperator(BaseOperator):
     """
     Copies the blob from wasb to synapse
 
