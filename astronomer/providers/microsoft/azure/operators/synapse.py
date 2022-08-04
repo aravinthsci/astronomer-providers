@@ -1,9 +1,12 @@
-import time
 from datetime import datetime, timedelta
 from typing import List, Optional, Sequence
 
 from airflow.models import BaseOperator
-from airflow.providers.microsoft.azure.hooks.data_factory import AzureDataFactoryHook
+from airflow.providers.microsoft.azure.hooks.data_factory import (
+    AzureDataFactoryHook,
+    AzureDataFactoryPipelineRunException,
+    AzureDataFactoryPipelineRunStatus,
+)
 from airflow.utils.context import Context
 from azure.mgmt.datafactory.models import (
     BlobSource,
@@ -93,18 +96,23 @@ class WasbToSynapseOperator(BaseOperator):
         run_response = client.pipelines.create_run(
             self.resource_group_name, self.factory_name, self.activity_name, parameters={}
         )
-
-        # Monitor the pipeline run
-        time.sleep(30)
-        pipeline_run = client.pipeline_runs.get(
-            self.resource_group_name, self.factory_name, run_response.run_id
-        )
-        print("\n\tPipeline run status: {}".format(pipeline_run.status))
+        self.run_id = vars(run_response)["run_id"]
+        if hook.wait_for_pipeline_run_status(
+            run_id=self.run_id,
+            expected_statuses=AzureDataFactoryPipelineRunStatus.SUCCEEDED,
+            resource_group_name=self.resource_group_name,
+            factory_name=self.factory_name,
+        ):
+            self.log.info("Pipeline run %s has completed successfully.", self.run_id)
+        else:
+            raise AzureDataFactoryPipelineRunException(
+                f"Pipeline run {self.run_id} has failed or has been cancelled."
+            )
         filter_params = RunFilterParameters(
             last_updated_after=datetime.now() - timedelta(1),
             last_updated_before=datetime.now() + timedelta(1),
         )
         query_response = client.activity_runs.query_by_pipeline_run(
-            self.resource_group_name, self.factory_name, pipeline_run.run_id, filter_params
+            self.resource_group_name, self.factory_name, self.run_id, filter_params
         )
         print(query_response.value[0])
