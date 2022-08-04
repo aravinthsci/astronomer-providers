@@ -25,18 +25,31 @@ with DAG(
 ) as dag:
     wasb_to_synapse = WasbToSynapseOperator(
         task_id="wasb_to_synapse",
-        source_name="DelimitedText2",
-        destination_name="AzureSynapseAnalyticsTable2",
+        source_name="DelimitedText3",
+        destination_name="AzureSynapseAnalyticsTable3",
         resource_group_name="team_provider_resource_group_test",
         factory_name="providersdf",
-        activity_name="copy_activity_rajath",
+        activity_name="copy_active_business_locations",
         translator_type="TabularTranslator",
         mappings=[
-            {"source": {"name": "column1"}, "sink": {"name": "col1"}},
-            {"source": {"name": "column2"}, "sink": {"name": "col2"}},
+            {"source": {"name": "Location Id"}, "sink": {"name": "col1"}},
+            {"source": {"name": "Business Account Number"}, "sink": {"name": "col2"}},
+            {"source": {"name": "Ownership Name"}, "sink": {"name": "col3"}},
+            {"source": {"name": "DBA Name"}, "sink": {"name": "col4"}},
+            {"source": {"name": "Street Address"}, "sink": {"name": "col5"}},
+            {"source": {"name": "City"}, "sink": {"name": "col6"}},
+            {"source": {"name": "State"}, "sink": {"name": "col7"}},
+            {"source": {"name": "Source Zipcode"}, "sink": {"name": "col8"}},
+            {"source": {"name": "Business Start Date"}, "sink": {"name": "col9"}},
+            {"source": {"name": "Business End Date"}, "sink": {"name": "col10"}},
+            {"source": {"name": "Location Start Date"}, "sink": {"name": "col11"}},
+            {"source": {"name": "Location End Date"}, "sink": {"name": "col12"}},
+            {"source": {"name": "Mail Address"}, "sink": {"name": "col13"}},
         ],
     )
     synapse_sql_query = SynapseSQLOperator(
         task_id="synapse_sql_query",
-        sql="SELECT TOP (10) [col1],[col2] from [dbo].[table_with_multiple_cols]",
+        sql="SELECT TOP (10) [col1],[col2] from [dbo].[active_business_locations]",
     )
+
+    wasb_to_synapse >> synapse_sql_query
