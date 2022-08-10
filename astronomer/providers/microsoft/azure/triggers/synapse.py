@@ -98,7 +98,6 @@ class WasbToSynpaseTrigger(BaseTrigger):
                 sink=dw_sink,
                 translator={"type": self.translator_type, "mappings": self.mappings},
             )
-            # params_for_pipeline = dict()
             p_obj = PipelineResource(activities=[copy_activity], parameters={})
             await client.pipelines.create_or_update(
                 self.resource_group_name, self.factory_name, self.activity_name, p_obj
@@ -108,7 +107,6 @@ class WasbToSynpaseTrigger(BaseTrigger):
             )
             await client.close()
             self.run_id = vars(run_response)["run_id"]
-            print(self.run_id)
             pipeline_run_status = await hook.get_adf_pipeline_run_status(
                 run_id=self.run_id,
                 resource_group_name=self.resource_group_name,
