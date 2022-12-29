@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import warnings
-from typing import Any, Optional, Sequence, Tuple, Union
+from typing import Any, Optional, Sequence, Tuple, Union, Dict
 
 from airflow.providers.google.common.consts import CLIENT_INFO
+from airflow.version import version as airflow_version
 from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
 from google.api_core import gapic_v1
 from google.api_core.client_options import ClientOptions
@@ -20,7 +23,7 @@ class DataprocHookAsync(GoogleBaseHook):
     """Async Hook for Google Cloud Dataproc APIs"""
 
     def get_cluster_client(
-        self, region: Optional[str] = None, location: Optional[str] = None
+            self, region: Optional[str] = None, location: Optional[str] = None
     ) -> ClusterControllerAsyncClient:
         """
         Get async cluster controller client for GCP Dataproc.
@@ -42,7 +45,7 @@ class DataprocHookAsync(GoogleBaseHook):
         )
 
     def get_job_client(
-        self, region: Optional[str] = None, location: Optional[str] = None
+            self, region: Optional[str] = None, location: Optional[str] = None
     ) -> JobControllerAsyncClient:
         """
         Get async job controller for GCP Dataproc.
@@ -61,6 +64,47 @@ class DataprocHookAsync(GoogleBaseHook):
             credentials=credentials,
             client_info=CLIENT_INFO,
             client_options=client_options,
+        )
+
+    async def create_cluster(
+        self,
+        project_id,
+        region,
+        cluster_name,
+        cluster_config,
+        retry:Union[Retry, gapic_v1.method._MethodDefault] = gapic_v1.method.DEFAULT,
+        timeout: float = None,
+        metadata: Sequence[Tuple[str, str]] = (),
+        labels: Dict[str, str] | None = None,
+        virtual_cluster_config: Dict[str, str] | None = None,
+        request_id: str | None = None,
+    ):
+        client = self.get_cluster_client(region=region)
+
+        labels = labels or {}
+        labels.update({"airflow-version": "v" + airflow_version.replace(".", "-").replace("+", "-")})
+
+        cluster = {
+            "project_id": project_id,
+            "cluster_name": cluster_name,
+        }
+
+        if virtual_cluster_config is not None:
+            cluster["virtual_cluster_config"] = virtual_cluster_config
+        if cluster_config is not None:
+            cluster["config"] = cluster_config
+            cluster["labels"] = labels
+
+        return await client.create_cluster(
+            request={
+                "project_id": project_id,
+                "region": region,
+                "cluster": cluster,
+                "request_id": request_id,
+            },
+            retry=retry,
+            timeout=timeout,
+            metadata=metadata,
         )
 
     async def get_cluster(
@@ -92,14 +136,14 @@ class DataprocHookAsync(GoogleBaseHook):
 
     @GoogleBaseHook.fallback_to_default_project_id
     async def get_job(
-        self,
-        job_id: str,
-        project_id: str,
-        timeout: float = 5,
-        region: Optional[str] = None,
-        location: Optional[str] = None,
-        retry: Union[Retry, gapic_v1.method._MethodDefault] = gapic_v1.method.DEFAULT,
-        metadata: Sequence[Tuple[str, str]] = (),
+            self,
+            job_id: str,
+            project_id: str,
+            timeout: float = 5,
+            region: Optional[str] = None,
+            location: Optional[str] = None,
+            retry: Union[Retry, gapic_v1.method._MethodDefault] = gapic_v1.method.DEFAULT,
+            metadata: Sequence[Tuple[str, str]] = (),
     ) -> JobType:
         """
         Gets the resource representation for a job using `JobControllerAsyncClient`.
@@ -124,7 +168,7 @@ class DataprocHookAsync(GoogleBaseHook):
         return job
 
     def _get_client_options_and_region(
-        self, region: Optional[str] = None, location: Optional[str] = None
+            self, region: Optional[str] = None, location: Optional[str] = None
     ) -> Tuple[ClientOptions, Optional[str]]:
         """
         Checks for location if present or not and creates a client options using the provided region/location

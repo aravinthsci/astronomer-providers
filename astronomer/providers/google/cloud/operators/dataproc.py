@@ -16,6 +16,7 @@ from airflow.providers.google.cloud.operators.dataproc import (
 )
 from google.api_core.exceptions import AlreadyExists
 
+from astronomer.providers.google.cloud.hooks.dataproc import DataprocHookAsync
 from astronomer.providers.google.cloud.triggers.dataproc import (
     DataprocCreateClusterTrigger,
     DataprocDeleteClusterTrigger,
@@ -74,7 +75,7 @@ class DataprocCreateClusterOperatorAsync(DataprocCreateClusterOperator):
 
     def execute(self, context: Context) -> None:  # type: ignore[override]
         """Call create cluster API and defer to DataprocCreateClusterTrigger to check the status"""
-        hook = DataprocHook(gcp_conn_id=self.gcp_conn_id, impersonation_chain=self.impersonation_chain)
+        hook = DataprocHookAsync(gcp_conn_id=self.gcp_conn_id, impersonation_chain=self.impersonation_chain)
         DataprocLink.persist(
             context=context, task_instance=self, url=DATAPROC_CLUSTER_LINK, resource=self.cluster_name
         )
