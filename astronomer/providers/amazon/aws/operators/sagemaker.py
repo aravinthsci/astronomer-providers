@@ -60,10 +60,17 @@ class SageMakerProcessingOperatorAsync(SageMakerProcessingOperator):
         """
         self.preprocess_config()
         processing_job_name = self.config["ProcessingJobName"]
-        if self.hook.find_processing_job_by_name(processing_job_name):
-            raise AirflowException(
-                f"A SageMaker processing job with name {processing_job_name} already exists."
-            )
+        existing_jobs_found = self.hook.count_processing_jobs_by_name(processing_job_name)
+        if existing_jobs_found:
+            if self.action_if_job_exists == "fail":
+                raise AirflowException(
+                    f"A SageMaker processing job with name {processing_job_name} already exists."
+                )
+            elif self.action_if_job_exists == "increment":
+                self.log.info("Found existing processing job with name '%s'.", processing_job_name)
+                new_processing_job_name = f"{processing_job_name}-{existing_jobs_found + 1}"
+                self.config["ProcessingJobName"] = new_processing_job_name
+                self.log.info("Incremented processing job name to '%s'.", new_processing_job_name)
         self.log.info("Creating SageMaker processing job %s.", self.config["ProcessingJobName"])
         response = self.hook.create_processing_job(
             self.config,
