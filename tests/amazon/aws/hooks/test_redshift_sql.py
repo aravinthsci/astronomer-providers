@@ -34,8 +34,8 @@ from astronomer.providers.amazon.aws.hooks.redshift_sql import RedshiftSQLHookAs
         ),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.is_still_running")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.is_still_running", autospec=True)
 async def test_get_query_status(
     mock_is_still_running, mock_conn, query_ids, describe_statement_response, expected_result
 ):
@@ -58,7 +58,7 @@ async def test_get_query_status(
         ("uuid", {"Status": "ABORTED"}, False),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn", autospec=True)
 async def test_is_still_running(mock_client, query_id, describe_statement_response, expected_result):
     hook = RedshiftSQLHookAsync()
     mock_client.return_value.describe_statement.return_value = describe_statement_response
@@ -71,7 +71,7 @@ async def test_is_still_running(mock_client, query_id, describe_statement_respon
     "query_id, describe_statement_response, expected_result",
     [("uuid", {"Status": "FINISHED"}, False)],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn", autospec=True)
 async def test_is_still_running_value_error(
     mock_client, query_id, describe_statement_response, expected_result
 ):
@@ -82,8 +82,8 @@ async def test_is_still_running_value_error(
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.is_still_running")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.is_still_running", autospec=True)
 async def test_get_query_status_exception(mock_is_still_running, mock_conn):
     hook = RedshiftSQLHookAsync()
     mock_is_still_running.return_value = False
@@ -113,7 +113,7 @@ async def test_get_query_status_exception(mock_is_still_running, mock_conn):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn", autospec=True)
 async def test_get_query_status_value_error(mock_client):
     hook = RedshiftSQLHookAsync()
     mock_client.side_effect = ValueError("Test value error")
@@ -122,7 +122,7 @@ async def test_get_query_status_value_error(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_sql.RedshiftSQLHookAsync.get_conn", autospec=True)
 async def test_is_still_running_exception(mock_conn):
     hook = RedshiftSQLHookAsync()
     mock_conn.return_value.describe_statement.side_effect = ClientError(

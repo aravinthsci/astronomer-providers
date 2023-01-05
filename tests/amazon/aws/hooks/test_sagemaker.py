@@ -49,7 +49,7 @@ STREAM_LOG_EVENTS = [
 
 class TestSagemakerHookAsync:
     @pytest.mark.asyncio
-    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async", autospec=True)
     async def test_sagemaker_processing_job(self, mock_client):
         """Test sagemaker async hook function to describe the processing job using Aiobotocore lib"""
         mock_client.return_value.__aenter__.return_value.describe_processing_job.return_value = {
@@ -60,7 +60,7 @@ class TestSagemakerHookAsync:
         assert result == {"test": "response"}
 
     @pytest.mark.asyncio
-    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async", autospec=True)
     async def test_sagemaker_processing_job_exception(self, mock_client):
         """Assert describe_processing_job method throw exception"""
         mock_client.return_value.__aenter__.return_value.describe_processing_job.side_effect = ClientError(
@@ -84,7 +84,7 @@ class TestSagemakerHookAsync:
             await hook.describe_processing_job_async(job_name="test_job")
 
     @pytest.mark.asyncio
-    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async", autospec=True)
     async def test_sagemaker_transform_job(self, mock_client):
         """Test sagemaker async hook function to describe the transform job using Aiobotocore lib"""
         mock_client.return_value.__aenter__.return_value.describe_transform_job.return_value = {
@@ -95,7 +95,7 @@ class TestSagemakerHookAsync:
         assert result == {"test": "response"}
 
     @pytest.mark.asyncio
-    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async", autospec=True)
     async def test_sagemaker_transform_job_exception(self, mock_client):
         """Assert describe_transform_job method throw exception"""
         mock_client.return_value.__aenter__.return_value.describe_transform_job.side_effect = ClientError(
@@ -119,7 +119,7 @@ class TestSagemakerHookAsync:
             await hook.describe_transform_job_async(job_name="test_job")
 
     @pytest.mark.asyncio
-    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async", autospec=True)
     async def test_sagemaker_training_job(self, mock_client):
         """Test sagemaker async hook function to describe the training job using Aiobotocore lib"""
         mock_client.return_value.__aenter__.return_value.describe_training_job.return_value = {
@@ -130,7 +130,7 @@ class TestSagemakerHookAsync:
         assert result == {"test": "response"}
 
     @pytest.mark.asyncio
-    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async", autospec=True)
     async def test_sagemaker_training_job_exception(self, mock_client):
         """Assert describe_training_job method throw exception"""
         mock_client.return_value.__aenter__.return_value.describe_training_job.side_effect = ClientError(
@@ -155,7 +155,7 @@ class TestSagemakerHookAsync:
 
     @pytest.mark.asyncio
     @mock.patch("airflow.providers.amazon.aws.hooks.sagemaker.argmin")
-    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_log_events_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_log_events_async", autospec=True)
     async def test_multi_stream_iter(self, mock_log_stream, mock_argmin):
         event = {"timestamp": int(time.time()) * 1000}
         mock_argmin.return_value = 1
@@ -167,12 +167,14 @@ class TestSagemakerHookAsync:
 
     @pytest.mark.asyncio
     @mock.patch.object(time, "time")
-    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async", autospec=True)
     @mock.patch(
-        "astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.describe_training_job_async"
+        "astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.describe_training_job_async", autospec=True
     )
-    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.describe_log_streams_async")
-    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async")
+    @mock.patch(
+        "astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.describe_log_streams_async", autospec=True
+    )
+    @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async", autospec=True)
     async def test_describe_training_job_with_logs_in_progress(
         self, mock_client, mock_describe_log_stream, mock_desc_training_job, mock_log_client, mock_time
     ):
@@ -197,11 +199,13 @@ class TestSagemakerHookAsync:
         "mock_job_log_state",
         [LogState.COMPLETE, LogState.JOB_COMPLETE],
     )
-    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async", autospec=True)
     @mock.patch(
-        "astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.describe_training_job_async"
+        "astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.describe_training_job_async", autospec=True
     )
-    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.describe_log_streams_async")
+    @mock.patch(
+        "astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.describe_log_streams_async", autospec=True
+    )
     @mock.patch("astronomer.providers.amazon.aws.hooks.sagemaker.SageMakerHookAsync.get_client_async")
     async def test_describe_training_job_with_logs_job_complete(
         self,

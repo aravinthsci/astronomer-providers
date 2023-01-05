@@ -11,7 +11,7 @@ class TestAwsLogsHookAsync:
     TEST_CONN_ID = "test_conn_id"
 
     @pytest.mark.asyncio
-    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async", autospec=True)
     async def test_describe_log_streams_async(self, mock_client):
         """Test AwsLogsHookAsync async hook function to describe_log_streams using Aiobotocore lib"""
         mock_client.return_value.__aenter__.return_value.describe_log_streams.return_value = {
@@ -24,7 +24,7 @@ class TestAwsLogsHookAsync:
         assert result == {"test": "response"}
 
     @pytest.mark.asyncio
-    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async", autospec=True)
     async def test_aws_log_resource_not_found_exception(self, mock_client):
         """Assert describe_log_streams method throw exception"""
         mock_client.return_value.__aenter__.return_value.describe_log_streams.side_effect = ClientError(
@@ -50,7 +50,7 @@ class TestAwsLogsHookAsync:
         assert response is None
 
     @pytest.mark.asyncio
-    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async", autospec=True)
     async def test_aws_log_exception(self, mock_client):
         """Assert describe_log_streams method throw exception"""
         mock_client.return_value.__aenter__.return_value.describe_log_streams.side_effect = ClientError(
@@ -80,7 +80,7 @@ class TestAwsLogsHookAsync:
         "mock_skip",
         [1, 2],
     )
-    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async")
+    @mock.patch("astronomer.providers.amazon.aws.hooks.aws_logs.AwsLogsHookAsync.get_client_async", autospec=True)
     async def test_get_log_events(self, mock_client, mock_skip):
         log_group_name = "example-group"
         log_stream_name = "example-log-stream"

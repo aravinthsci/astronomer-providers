@@ -53,7 +53,7 @@ JOB_NAME = "test-emr-job"
         ),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async", autospec=True)
 async def test_emr_container_cluster_status(mock_client, mock_expected_job_state, mock_result):
     """Test check_job_status async hook function to get the status of the job running in emr container
     using Aiobotocore lib"""
@@ -65,7 +65,7 @@ async def test_emr_container_cluster_status(mock_client, mock_expected_job_state
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async", autospec=True)
 async def test_emr_container_cluster_exception(mock_client):
     """Test check_job_status async hook function to get the status of the job running in emr container
     using Aiobotocore lib"""
@@ -111,7 +111,7 @@ def _emr_describe_step_response(state: str = "", reason: str = "", message: str 
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrStepSensorHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrStepSensorHookAsync.get_client_async", autospec=True)
 async def test_emr_describe_step_success(mock_client):
     """Assert check_job_status method return Steps"""
     expected = _emr_describe_step_response()
@@ -123,7 +123,7 @@ async def test_emr_describe_step_success(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrStepSensorHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrStepSensorHookAsync.get_client_async", autospec=True)
 async def test_emr_describe_step_failed(mock_client):
     """Assert emr_describe_step method throw exception"""
     mock_client.return_value.__aenter__.return_value.describe_step.side_effect = ClientError(
@@ -171,7 +171,7 @@ def test_failure_message_from_response():
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrJobFlowHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrJobFlowHookAsync.get_client_async", autospec=True)
 async def test_emr_job_flow_cluster_status(mock_client):
     """Test get_cluster_details async hook function to get the details of the cluster and job running in emr cluster
     using Aiobotocore lib"""
@@ -201,7 +201,7 @@ async def test_emr_job_flow_cluster_status(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrJobFlowHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrJobFlowHookAsync.get_client_async", autospec=True)
 async def test_emr_job_flow_get_cluster_details_exception(mock_client):
     """Test check_job_status async hook function to get the status of the job running in emr job flow sensor
     using Aiobotocore lib"""
@@ -288,7 +288,7 @@ def test_job_flow_failure_message_from_response_without_state_change():
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async", autospec=True)
 async def test_get_job_failure_reason_success(mock_client):
     """Assert get_job_failure_reason return failure reason as string"""
     mock_client.return_value.__aenter__.return_value.describe_job_run.return_value = {
@@ -304,7 +304,7 @@ async def test_get_job_failure_reason_success(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async", autospec=True)
 async def test_get_job_failure_reason_key_error(mock_client):
     """Assert get_job_failure_reason return None if failure reason not found"""
     mock_client.return_value.__aenter__.return_value.describe_job_run.return_value = {
@@ -318,7 +318,7 @@ async def test_get_job_failure_reason_key_error(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.emr.EmrContainerHookAsync.get_client_async", autospec=True)
 async def test_get_job_failure_reason_exception(mock_client):
     """Assert get_job_failure_reason return None on ClientError"""
     mock_client.return_value.__aenter__.return_value.describe_job_run.side_effect = ClientError(

@@ -35,7 +35,7 @@ from astronomer.providers.amazon.aws.hooks.redshift_cluster import RedshiftHookA
         ("astro-redshift-cluster-1", {"status": "success", "cluster_state": None}, {"Clusters": []}),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
 async def test_redshift_cluster_status(mock_client, mock_cluster_identifier, cluster_state, expected_result):
     """Test cluster status async hook function to get the cluster status by calling Aiobotocore lib"""
     # mocking async context function with return_value of __aenter__
@@ -48,7 +48,7 @@ async def test_redshift_cluster_status(mock_client, mock_cluster_identifier, clu
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
 async def test_redshift_cluster_not_found_status(mock_client):
     """
     Test cluster status async hook function to get the cluster status by calling Aiobotocore lib when cluster does not
@@ -73,7 +73,7 @@ async def test_redshift_cluster_not_found_status(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
 async def test_redshift_cluster_status_exception(mock_client):
     """Test cluster status async hook function by mocking exception"""
     mock_client.return_value.__aenter__.return_value.describe_clusters.side_effect = ClientError(
@@ -114,8 +114,8 @@ async def test_redshift_cluster_status_exception(mock_client):
         )
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
 async def test_delete_cluster(
     mock_client, mock_cluster_status, mock_cluster_identifier, cluster_state, expected_result
 ):
@@ -130,7 +130,7 @@ async def test_delete_cluster(
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
 async def test_delete_cluster_exception(mock_client):
     """Test delete cluster async hook function with exception by mocking return value of delete_cluster"""
     mock_client.return_value.__aenter__.return_value.delete_cluster.side_effect = ClientError(
@@ -169,8 +169,8 @@ async def test_delete_cluster_exception(mock_client):
         ),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
 async def test_pause_cluster(
     mock_client, mock_cluster_status, mock_cluster_identifier, cluster_state, expected_result
 ):
@@ -185,7 +185,7 @@ async def test_pause_cluster(
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
 async def test_pause_cluster_exception(mock_client):
     """Test Pause cluster async hook function with exception by mocking return value of pause_cluster"""
     mock_client.return_value.__aenter__.return_value.pause_cluster.side_effect = ClientError(
@@ -224,8 +224,8 @@ async def test_pause_cluster_exception(mock_client):
         )
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
 async def test_resume_cluster(
     mock_client, mock_cluster_status, mock_cluster_identifier, cluster_state, expected_result
 ):
@@ -240,7 +240,7 @@ async def test_resume_cluster(
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
 async def test_resume_cluster_exception(mock_client):
     """Test Resume cluster async hook function with exception by mocking return value of resume_cluster"""
     mock_client.return_value.__aenter__.return_value.resume_cluster.side_effect = ClientError(
@@ -269,8 +269,8 @@ async def test_resume_cluster_exception(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status", autospec=True)
 async def test_get_cluster_status(cluster_status, mock_client):
     """Test get_cluster_status async function with success response"""
     flag = asyncio.Event()
@@ -281,7 +281,7 @@ async def test_get_cluster_status(cluster_status, mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_cluster.RedshiftHookAsync.cluster_status", autospec=True)
 async def test_get_cluster_status_exception(cluster_status):
     """Test get_cluster_status async function with exception response"""
     flag = asyncio.Event()

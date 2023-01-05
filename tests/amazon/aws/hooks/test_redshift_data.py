@@ -39,8 +39,8 @@ TEST_SQL = "select * from any"
         ),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.is_still_running")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.is_still_running", autospec=True)
 async def test_get_query_status(
     mock_is_still_running, mock_conn, query_ids, describe_statement_response, expected_result
 ):
@@ -52,8 +52,8 @@ async def test_get_query_status(
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.is_still_running")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.is_still_running", autospec=True)
 async def test_get_query_status_with_sleep(mock_is_still_running, mock_conn):
     hook = RedshiftDataHook()
     mock_is_still_running.side_effect = [True, False]
@@ -64,8 +64,8 @@ async def test_get_query_status_with_sleep(mock_is_still_running, mock_conn):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.is_still_running")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.is_still_running", autospec=True)
 async def test_get_query_status_exception(mock_is_still_running, mock_conn):
     hook = RedshiftDataHook()
     mock_is_still_running.return_value = False
@@ -106,7 +106,7 @@ async def test_get_query_status_exception(mock_is_still_running, mock_conn):
         ("uuid", {"Status": "ABORTED"}, False),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
 async def test_is_still_running(mock_client, query_id, describe_statement_response, expected_result):
     hook = RedshiftDataHook()
     mock_client.return_value.describe_statement.return_value = describe_statement_response
@@ -115,7 +115,7 @@ async def test_is_still_running(mock_client, query_id, describe_statement_respon
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
 async def test_is_still_running_exception(mock_conn):
     hook = RedshiftDataHook()
     mock_conn.return_value.describe_statement.side_effect = ClientError(
@@ -150,7 +150,7 @@ def test_execute_query_exception_exception_with_none_sql():
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
 async def test_get_query_status_value_error(mock_client):
     hook = RedshiftDataHook()
     mock_client.side_effect = ValueError("Test value error")
@@ -159,7 +159,7 @@ async def test_get_query_status_value_error(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
 async def test_is_still_running_value_error(mock_client):
     hook = RedshiftDataHook()
     mock_client.side_effect = ValueError("Test value error")
@@ -168,7 +168,7 @@ async def test_is_still_running_value_error(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
 async def test_execute_query_value_error(mock_client):
     hook = RedshiftDataHook()
     mock_client.side_effect = ValueError("Test value error")
@@ -177,7 +177,7 @@ async def test_execute_query_value_error(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("airflow.providers.amazon.aws.hooks.base_aws.AwsBaseHook.__init__")
+@mock.patch("airflow.providers.amazon.aws.hooks.base_aws.AwsBaseHook.__init__", autospec=True)
 async def test_redshift_data_hook_value_error(mock_client):
     mock_client.side_effect = ValueError("Test value error")
     with pytest.raises(ValueError):
@@ -190,8 +190,8 @@ async def test_redshift_data_hook_value_error(mock_client):
         ("select * from table", {"Id": "uuid"}, ["uuid"]),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn_params")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn_params", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
 def test_execute_query(mock_conn, mock_params, sql, expected_response, expected_query_ids):
     hook = RedshiftDataHook()
     mock_params.return_value = {
@@ -207,8 +207,8 @@ def test_execute_query(mock_conn, mock_params, sql, expected_response, expected_
     assert resp[0] == expected_query_ids
 
 
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn_params")
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn_params", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_conn", autospec=True)
 def test_execute_query_exception(mock_conn, mock_params):
     hook = RedshiftDataHook()
     mock_params.return_value = {
@@ -288,7 +288,7 @@ def test_execute_query_exception(mock_conn, mock_params):
         ),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_connection")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_connection", autospec=True)
 def test_get_conn_params(mock_get_connection, connection_details, expected_output):
     mock_conn = Connection(extra=json.dumps(connection_details))
     mock_get_connection.return_value = mock_conn
@@ -323,7 +323,7 @@ def test_get_conn_params(mock_get_connection, connection_details, expected_outpu
         ),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_connection")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_connection", autospec=True)
 def test_get_conn_params_with_login_pwd(
     mock_get_connection, mock_login, mock_pwd, connection_details, expected_output
 ):
@@ -393,7 +393,7 @@ def test_get_conn_params_with_login_pwd(
         ),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_connection")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_connection", autospec=True)
 def test_get_conn_params_exception(mock_get_connection, connection_details, test):
     response = json.dumps(connection_details)
     mock_conn = Connection(extra=response)
@@ -404,7 +404,7 @@ def test_get_conn_params_exception(mock_get_connection, connection_details, test
         hook.get_conn_params()
 
 
-@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_connection")
+@mock.patch("astronomer.providers.amazon.aws.hooks.redshift_data.RedshiftDataHook.get_connection", autospec=True)
 def test_get_conn_params_aws_conn_id_unset_exception(mock_get_connection):
     response = json.dumps(
         {

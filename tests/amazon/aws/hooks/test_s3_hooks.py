@@ -21,7 +21,7 @@ async def test_aws_base_hook_async_get_client_async_without_get_connection():
     assert isinstance(response, ClientCreatorContext)
 
 
-@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection")
+@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection", autospec=True)
 @pytest.mark.asyncio
 async def test_aws_base_hook_async_get_client_async_with_get_connection(mock_connection):
     aws_base_hook_async_obj = AwsBaseHookAsync(client_type="S3", resource_type="S3")
@@ -30,7 +30,7 @@ async def test_aws_base_hook_async_get_client_async_with_get_connection(mock_con
     assert isinstance(response, ClientCreatorContext)
 
 
-@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection")
+@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection", autospec=True)
 @pytest.mark.asyncio
 async def test_aws_base_hook_async_get_client_async_with_aws_secrets(mock_get_connection):
     mock_conn = Connection(extra=json.dumps({"aws_access_key_id": "", "aws_secret_access_key": ""}))
@@ -42,7 +42,7 @@ async def test_aws_base_hook_async_get_client_async_with_aws_secrets(mock_get_co
     assert isinstance(response, ClientCreatorContext)
 
 
-@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection")
+@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection", autospec=True)
 @pytest.mark.asyncio
 async def test_aws_base_hook_async_get_client_async_with_aws_session(mock_get_connection):
     mock_conn = Connection(
@@ -57,8 +57,8 @@ async def test_aws_base_hook_async_get_client_async_with_aws_session(mock_get_co
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection")
-@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_role_credentials")
+@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_role_credentials", autospec=True)
 async def test_aws_base_hook_async_get_client_async_with_role_arn(mock_role_credentials, mock_get_connection):
     mock_conn = Connection(
         login="test",
@@ -78,9 +78,9 @@ async def test_aws_base_hook_async_get_client_async_with_role_arn(mock_role_cred
 
 
 @pytest.mark.asyncio
-@mock.patch("aiobotocore.session.get_session")
-@mock.patch("aiobotocore.session.ClientCreatorContext")
-@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection")
+@mock.patch("aiobotocore.session.get_session", autospec=True)
+@mock.patch("aiobotocore.session.ClientCreatorContext", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.base_aws.AwsBaseHookAsync.get_connection", autospec=True)
 async def test_get_role_credentials(mock_get_connection, mock_client_creator, mock_session):
     mock_conn = Connection(
         login="test",
@@ -109,7 +109,7 @@ async def test_get_role_credentials(mock_get_connection, mock_client_creator, mo
     assert response == {"AccessKeyId": "test", "SecretAccessKey": "test", "SessionToken": "test"}
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_get_file_metadata(mock_client):
     """
@@ -139,8 +139,8 @@ async def test_s3_key_hook_get_file_metadata(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async.head_object")
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async.head_object", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
 async def test_s3_key_hook_get_head_object(mock_client, mock_head_object):
     """
     Test if the key exists and asserts True if key is found.
@@ -152,7 +152,7 @@ async def test_s3_key_hook_get_head_object(mock_client, mock_head_object):
     assert task == {"ContentLength": 0}
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_get_head_object_with_error(mock_client):
     """
@@ -181,7 +181,7 @@ async def test_s3_key_hook_get_head_object_with_error(mock_client):
     assert response is None
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
 @pytest.mark.asyncio
 @unittest.expectedFailure
 async def test_s3_key_hook_get_head_object_raise_exception(mock_client):
@@ -212,7 +212,7 @@ async def test_s3_key_hook_get_head_object_raise_exception(mock_client):
         assert isinstance(response, err)
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_get_files_without_wildcard(mock_client):
     """
@@ -238,7 +238,7 @@ async def test_s3_key_hook_get_files_without_wildcard(mock_client):
     assert response == []
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_get_files_with_wildcard(mock_client):
     """
@@ -264,7 +264,7 @@ async def test_s3_key_hook_get_files_with_wildcard(mock_client):
     assert response == []
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_list_keys(mock_client):
     """
@@ -290,8 +290,8 @@ async def test_s3_key_hook_list_keys(mock_client):
     assert response == ["test_key", "test_key2"]
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_is_keys_unchanged_false(mock_list_keys, mock_client):
     """
@@ -335,8 +335,8 @@ async def test_s3_key_hook_is_keys_unchanged_false(mock_list_keys, mock_client):
     assert response.get("status") == "pending"
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_is_keys_unchanged_exception(mock_list_keys, mock_client):
     """
@@ -362,8 +362,8 @@ async def test_s3_key_hook_is_keys_unchanged_exception(mock_list_keys, mock_clie
     assert response == {"message": " test_bucket/test between pokes.", "status": "error"}
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_is_keys_unchanged_pending(mock_list_keys, mock_client):
     """
@@ -389,8 +389,8 @@ async def test_s3_key_hook_is_keys_unchanged_pending(mock_list_keys, mock_client
     assert response.get("status") == "pending"
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_is_keys_unchanged_inactivity_error(mock_list_keys, mock_client):
     """
@@ -419,8 +419,8 @@ async def test_s3_key_hook_is_keys_unchanged_inactivity_error(mock_list_keys, mo
     }
 
 
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys")
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync._list_keys", autospec=True)
 @pytest.mark.asyncio
 async def test_s3_key_hook_is_keys_unchanged_true(mock_list_keys, mock_client):
     """
@@ -458,7 +458,7 @@ async def test_s3_key_hook_is_keys_unchanged_true(mock_list_keys, mock_client):
         ("async-prefix1/", "async-prefix2/"),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async", autospec=True)
 async def test_s3_prefix_sensor_hook_list_prefixes(mock_client, test_first_prefix, test_second_prefix):
     """
     Test list_prefixes whether it returns a valid response
@@ -485,8 +485,8 @@ async def test_s3_prefix_sensor_hook_list_prefixes(mock_client, test_first_prefi
         ("async-prefix2", "test_bucket"),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.list_prefixes")
+@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.list_prefixes", autospec=True)
 async def test_s3_prefix_sensor_hook_check_for_prefix(
     mock_list_prefixes, mock_client, mock_prefix, mock_bucket
 ):
@@ -515,9 +515,9 @@ async def test_s3_prefix_sensor_hook_check_for_prefix(
 
 
 @pytest.mark.asyncio
-@mock.patch("airflow.providers.amazon.aws.hooks.s3.S3Hook.get_s3_bucket_key")
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_head_object")
-@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async")
+@mock.patch("airflow.providers.amazon.aws.hooks.s3.S3Hook.get_s3_bucket_key", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_head_object", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async", autospec=True)
 async def test_s3__check_key_without_wild_card(mock_client, mock_head_object, mock_get_bucket_key):
     """Test _check_key function"""
     mock_get_bucket_key.return_value = "test_bucket", "test.txt"
@@ -530,9 +530,9 @@ async def test_s3__check_key_without_wild_card(mock_client, mock_head_object, mo
 
 
 @pytest.mark.asyncio
-@mock.patch("airflow.providers.amazon.aws.hooks.s3.S3Hook.get_s3_bucket_key")
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_head_object")
-@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async")
+@mock.patch("airflow.providers.amazon.aws.hooks.s3.S3Hook.get_s3_bucket_key", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_head_object", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async", autospec=True)
 async def test_s3__check_key_none_without_wild_card(mock_client, mock_head_object, mock_get_bucket_key):
     """Test _check_key function when get head object returns none"""
     mock_get_bucket_key.return_value = "test_bucket", "test.txt"
@@ -545,9 +545,9 @@ async def test_s3__check_key_none_without_wild_card(mock_client, mock_head_objec
 
 
 @pytest.mark.asyncio
-@mock.patch("airflow.providers.amazon.aws.hooks.s3.S3Hook.get_s3_bucket_key")
-@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_file_metadata")
-@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async")
+@mock.patch("airflow.providers.amazon.aws.hooks.s3.S3Hook.get_s3_bucket_key", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.triggers.s3.S3HookAsync.get_file_metadata", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.s3.S3HookAsync.get_client_async", autospec=True)
 async def test_s3__check_key_with_wild_card(mock_client, mock_get_file_metadata, mock_get_bucket_key):
     """Test _check_key function"""
     mock_get_bucket_key.return_value = "test_bucket", "test"

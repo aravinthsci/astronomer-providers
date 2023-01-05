@@ -11,8 +11,8 @@ BATCH_API_SUCCESS_RESPONSE = {"jobs": [{"jobId": JOB_ID, "status": "SUCCEEDED"}]
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.poll_job_status")
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async", aautospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.poll_job_status", autospec=True)
 async def test_monitor_job_with_success(mock_poll_job_status, mock_client):
     """Tests that the  monitor_job method returns expected event once successful"""
     mock_poll_job_status.return_value = True
@@ -23,8 +23,8 @@ async def test_monitor_job_with_success(mock_poll_job_status, mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.poll_job_status")
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.poll_job_status", autospec=True)
 async def test_monitor_job_with_no_job_id(mock_poll_job_status, mock_client):
     """Tests that the monitor_job method raises expected exception when incorrect job id is passed"""
     mock_poll_job_status.return_value = True
@@ -37,8 +37,8 @@ async def test_monitor_job_with_no_job_id(mock_poll_job_status, mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.poll_job_status")
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.poll_job_status", autospec=True)
 async def test_hit_api_throttle(mock_poll_job_status, mock_client):
     """Tests that the get_job_description method raises  correct exception when retries exceed the threshold"""
     mock_poll_job_status.return_value = True
@@ -63,8 +63,8 @@ async def test_hit_api_throttle(mock_poll_job_status, mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async")
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.poll_job_status")
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async", autospec=True)
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.poll_job_status", autospec=True)
 async def test_client_error(mock_poll_job_status, mock_client):
     """Test that the get_job_description method raises  correct exception when the error code
     from boto3 api is not TooManyRequestsException"""
@@ -86,7 +86,7 @@ async def test_client_error(mock_poll_job_status, mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async", autospec=True)
 async def test_check_job_success(mock_client):
     """Tests that the check_job_success method returns True when job succeeds"""
     mock_client.return_value.__aenter__.return_value.describe_jobs.return_value = BATCH_API_SUCCESS_RESPONSE
@@ -106,7 +106,7 @@ async def test_check_job_success(mock_client):
         ("STRANGE", f"AWS Batch job ({JOB_ID}) has unknown status"),
     ],
 )
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async", autospec=True)
 async def test_check_job_raises_exception(mock_client, mock_expected_job_state, expected_exception_msg):
     """Tests that the check_job_success method raises exception correctly as per job state"""
     mock_job = {"jobs": [{"jobId": JOB_ID, "status": mock_expected_job_state}]}
@@ -118,7 +118,7 @@ async def test_check_job_raises_exception(mock_client, mock_expected_job_state, 
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async", autospec=True)
 async def test_poll_job_status_raises_for_max_retries(mock_client):
     mock_job = {"jobs": [{"jobId": JOB_ID, "status": "RUNNABLE"}]}
     mock_client.return_value.__aenter__.return_value.describe_jobs.return_value = mock_job
@@ -129,7 +129,7 @@ async def test_poll_job_status_raises_for_max_retries(mock_client):
 
 
 @pytest.mark.asyncio
-@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async")
+@mock.patch("astronomer.providers.amazon.aws.hooks.batch_client.BatchClientHookAsync.get_client_async", autospec=True)
 async def test_poll_job_status_in_match_status(mock_client):
     mock_job = BATCH_API_SUCCESS_RESPONSE
     mock_client.return_value.__aenter__.return_value.describe_jobs.return_value = mock_job
