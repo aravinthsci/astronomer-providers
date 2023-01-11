@@ -68,3 +68,46 @@ class RedshiftDataOperatorAsync(RedshiftDataOperator):
                 self.log.info("%s completed successfully.", self.task_id)
         else:
             raise AirflowException("Did not receive valid event from the trigerrer")
+
+    def get_openlineage_facets_on_complete(self, task_instance):
+        """Returns the lineage data for RedshiftDataOperatorAsync"""
+        from openlineage.airflow.extractors.base import OperatorLineage
+        from openlineage.client.facet import (
+            BaseFacet,
+            OutputStatisticsOutputDatasetFacet,
+            SqlJobFacet,
+        )
+        from openlineage.client.run import Dataset as OpenlineageDataset
+
+        run_facets: dict[str, BaseFacet] = {}
+        job_facets = {"sql": SqlJobFacet(query=self.sql)}
+        input_dataset: list[OpenlineageDataset] = []
+        output_dataset: list[OpenlineageDataset] = []
+        query_ids = task_instance.xcom_pull(task_ids=task_instance.task_id, key="return_value")
+        redshift_data_hook = RedshiftDataHook(aws_conn_id=self.redshift_conn_id)
+        res = redshift_data_hook.get_query_response(query_ids[0])
+        conn = redshift_data_hook.get_connection(self.redshift_conn_id)
+        openlineage_dataset_namespace = f"redshift://{res['ClusterIdentifier']}:{conn.port or 5439}"
+        openlineage_dataset_name = f"{conn.schema}.{res.get('Database', None)}"
+        input_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={},
+            )
+        ]
+        output_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={
+                    "outputStatistics": OutputStatisticsOutputDatasetFacet(
+                        rowCount=res.get("ResultRows", 0),
+                        size=res.get("ResultSize", 0),
+                    ),
+                },
+            )
+        ]
+        return OperatorLineage(
+            inputs=input_dataset, outputs=output_dataset, run_facets=run_facets, job_facets=job_facets
+        )

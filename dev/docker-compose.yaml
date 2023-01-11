@@ -22,8 +22,7 @@ x-airflow-common:
     ASTRONOMER_ENVIRONMENT: local
     AIRFLOW__LINEAGE__BACKEND: openlineage.lineage_backend.OpenLineageBackend
     OPENLINEAGE_URL: http://host.docker.internal:5050/
-    OPENLINEAGE_EXTRACTORS: "astronomer.providers.google.cloud.extractors.bigquery.BigQueryAsyncExtractor;\
-                            astronomer.providers.amazon.aws.extractors.redshift.RedshiftAsyncExtractor"
+    OPENLINEAGE_EXTRACTORS: "astronomer.providers.google.cloud.extractors.bigquery.BigQueryAsyncExtractor"
   volumes:
     - ./dags:/usr/local/airflow/dags
     - ./logs:/usr/local/airflow/logs

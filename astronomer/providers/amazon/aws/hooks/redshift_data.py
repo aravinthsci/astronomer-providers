@@ -202,3 +202,24 @@ class RedshiftDataHook(AwsBaseHook):
             return False
         except botocore.exceptions.ClientError as error:
             return {"status": "error", "message": str(error), "type": "ERROR"}
+
+    def get_query_response(self, query_id: str):
+        """
+        Function to get the Query status by query Id, this function
+        takes query_id make async connection
+        to redshift data to get the query status by query id returns the query status.
+
+        :param query_ids: A query id
+        """
+        try:
+            try:
+                # for apache-airflow-providers-amazon>=3.0.0
+                client = self.get_conn()
+            except ValueError:
+                # for apache-airflow-providers-amazon>=4.1.0
+                self.resource_type = None
+                client = self.get_conn()
+            res = client.describe_statement(Id=query_id)
+            return res
+        except botocore.exceptions.ClientError as error:
+            return {"status": "error", "message": str(error), "type": "ERROR"}
