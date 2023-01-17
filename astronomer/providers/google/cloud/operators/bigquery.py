@@ -138,6 +138,61 @@ class BigQueryInsertJobOperatorAsync(BigQueryInsertJobOperator, BaseOperator):
             event["message"],
         )
 
+    def get_openlineage_facets_on_complete(self, task_instance):
+        """Returns the lineage data for BigQueryInsertJobOperatorAsync"""
+        from openlineage.airflow.extractors.base import OperatorLineage
+        from openlineage.client.facet import (
+            BaseFacet,
+            OutputStatisticsOutputDatasetFacet,
+            SqlJobFacet,
+        )
+        from openlineage.client.run import Dataset as OpenlineageDataset
+        from openlineage.common.utils import get_from_nullable_chain
+
+        run_facets: dict[str, BaseFacet] = {}
+        job_facets = {"sql": SqlJobFacet(query=self.configuration["query"]["query"])}
+        input_dataset: list[OpenlineageDataset] = []
+        output_dataset: list[OpenlineageDataset] = []
+        job_id = task_instance.xcom_pull(task_ids=task_instance.task_id, key="job_id")
+        hook = BigQueryHook(
+            gcp_conn_id=self.gcp_conn_id,
+            delegate_to=self.delegate_to,
+            impersonation_chain=self.impersonation_chain,
+        )
+        job = hook.get_job(job_id=job_id)
+        props = job._properties
+
+        dataset_id = props["configuration"]["destinationTable"]["datasetId"]
+        table_id = props["configuration"]["destinationTable"]["tableId"]
+        openlineage_dataset_namespace = hook.get_uri()
+        openlineage_dataset_name = f".{dataset_id}.{table_id}"
+        stages = get_from_nullable_chain(props, ["statistics", "query", "queryPlan"])
+        output = stages[-1]
+        out_rows = output.get("recordsWritten", 0)
+        out_bytes = output.get("shuffleOutputBytes", 0)
+        input_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={},
+            )
+        ]
+        output_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={
+                    "outputStatistics": OutputStatisticsOutputDatasetFacet(
+                        rowCount=out_rows,
+                        size=out_bytes,
+                    ),
+                },
+            )
+        ]
+        return OperatorLineage(
+            inputs=input_dataset, outputs=output_dataset, run_facets=run_facets, job_facets=job_facets
+        )
+
 
 class BigQueryCheckOperatorAsync(BigQueryCheckOperator):
     """
@@ -195,6 +250,61 @@ class BigQueryCheckOperatorAsync(BigQueryCheckOperator):
             raise AirflowException(f"Test failed.\nQuery:\n{self.sql}\nResults:\n{records!s}")
         self.log.info("Record: %s", event["records"])
         self.log.info("Success.")
+
+    def get_openlineage_facets_on_complete(self, task_instance):
+        """Returns the lineage data for BigQueryCheckOperatorAsync"""
+        from openlineage.airflow.extractors.base import OperatorLineage
+        from openlineage.client.facet import (
+            BaseFacet,
+            OutputStatisticsOutputDatasetFacet,
+            SqlJobFacet,
+        )
+        from openlineage.client.run import Dataset as OpenlineageDataset
+        from openlineage.common.utils import get_from_nullable_chain
+
+        run_facets: dict[str, BaseFacet] = {}
+        job_facets = {"sql": SqlJobFacet(query=self.sql)}
+        input_dataset: list[OpenlineageDataset] = []
+        output_dataset: list[OpenlineageDataset] = []
+        job_id = task_instance.xcom_pull(task_ids=task_instance.task_id, key="job_id")
+        hook = BigQueryHook(
+            gcp_conn_id=self.gcp_conn_id,
+            impersonation_chain=self.impersonation_chain,
+        )
+        job = hook.get_job(job_id=job_id)
+        props = job._properties
+
+        dataset_id = props["configuration"]["destinationTable"]["datasetId"]
+        table_id = props["configuration"]["destinationTable"]["tableId"]
+        openlineage_dataset_namespace = hook.get_uri()
+        openlineage_dataset_name = f".{dataset_id}.{table_id}"
+        stages = get_from_nullable_chain(props, ["statistics", "query", "queryPlan"])
+        output = stages[-1]
+        out_rows = output.get("recordsWritten", 0)
+        out_bytes = output.get("shuffleOutputBytes", 0)
+        input_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={},
+            )
+        ]
+        output_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={
+                    "outputStatistics": OutputStatisticsOutputDatasetFacet(
+                        rowCount=out_rows,
+                        size=out_bytes,
+                    ),
+                },
+            )
+        ]
+        return OperatorLineage(
+            inputs=input_dataset, outputs=output_dataset, run_facets=run_facets, job_facets=job_facets
+        )
+
 
 
 class BigQueryGetDataOperatorAsync(BigQueryGetDataOperator):
@@ -313,6 +423,60 @@ class BigQueryGetDataOperatorAsync(BigQueryGetDataOperator):
 
         self.log.info("Total extracted rows: %s", len(event["records"]))
         return event["records"]
+    
+    def get_openlineage_facets_on_complete(self, task_instance):
+        """Returns the lineage data for BigQueryCheckOperatorAsync"""
+        from openlineage.airflow.extractors.base import OperatorLineage
+        from openlineage.client.facet import (
+            BaseFacet,
+            OutputStatisticsOutputDatasetFacet,
+            SqlJobFacet,
+        )
+        from openlineage.client.run import Dataset as OpenlineageDataset
+        from openlineage.common.utils import get_from_nullable_chain
+
+        run_facets: dict[str, BaseFacet] = {}
+        job_facets = {"sql": SqlJobFacet(query=self.generate_query())}
+        input_dataset: list[OpenlineageDataset] = []
+        output_dataset: list[OpenlineageDataset] = []
+        job_id = task_instance.xcom_pull(task_ids=task_instance.task_id, key="job_id")
+        hook = BigQueryHook(
+            gcp_conn_id=self.gcp_conn_id,
+            delegate_to=self.delegate_to,
+            impersonation_chain=self.impersonation_chain,
+        )
+        job = hook.get_job(job_id=job_id)
+        props = job._properties
+
+        openlineage_dataset_namespace = hook.get_uri()
+        openlineage_dataset_name = f".{self.dataset_id}.{self.table_id}"
+        stages = get_from_nullable_chain(props, ["statistics", "query", "queryPlan"])
+        output = stages[-1]
+        out_rows = output.get("recordsWritten", 0)
+        out_bytes = output.get("shuffleOutputBytes", 0)
+        input_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={},
+            )
+        ]
+        output_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={
+                    "outputStatistics": OutputStatisticsOutputDatasetFacet(
+                        rowCount=out_rows,
+                        size=out_bytes,
+                    ),
+                },
+            )
+        ]
+        return OperatorLineage(
+            inputs=input_dataset, outputs=output_dataset, run_facets=run_facets, job_facets=job_facets
+        )
+
 
 
 class BigQueryIntervalCheckOperatorAsync(BigQueryIntervalCheckOperator):
@@ -405,6 +569,59 @@ class BigQueryIntervalCheckOperatorAsync(BigQueryIntervalCheckOperator):
             self.task_id,
             event["status"],
         )
+    
+    def get_openlineage_facets_on_complete(self, task_instance):
+        """Returns the lineage data for BigQueryInsertJobOperatorAsync"""
+        from openlineage.airflow.extractors.base import OperatorLineage
+        from openlineage.client.facet import (
+            BaseFacet,
+            OutputStatisticsOutputDatasetFacet,
+            SqlJobFacet,
+        )
+        from openlineage.client.run import Dataset as OpenlineageDataset
+        from openlineage.common.utils import get_from_nullable_chain
+
+        run_facets: dict[str, BaseFacet] = {}
+        job_facets = {"sql": SqlJobFacet(query=self.sql1)}
+        input_dataset: list[OpenlineageDataset] = []
+        output_dataset: list[OpenlineageDataset] = []
+        job_id = task_instance.xcom_pull(task_ids=task_instance.task_id, key="job_id")
+        hook = BigQueryHook(
+            gcp_conn_id=self.gcp_conn_id,
+            impersonation_chain=self.impersonation_chain,
+        )
+        job = hook.get_job(job_id=job_id)
+        props = job._properties
+
+        openlineage_dataset_namespace = hook.get_uri()
+        openlineage_dataset_name = f".{self.table}"
+        stages = get_from_nullable_chain(props, ["statistics", "query", "queryPlan"])
+        output = stages[-1]
+        out_rows = output.get("recordsWritten", 0)
+        out_bytes = output.get("shuffleOutputBytes", 0)
+        input_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={},
+            )
+        ]
+        output_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={
+                    "outputStatistics": OutputStatisticsOutputDatasetFacet(
+                        rowCount=out_rows,
+                        size=out_bytes,
+                    ),
+                },
+            )
+        ]
+        return OperatorLineage(
+            inputs=input_dataset, outputs=output_dataset, run_facets=run_facets, job_facets=job_facets
+        )
+
 
 
 class BigQueryValueCheckOperatorAsync(BigQueryValueCheckOperator):  # noqa: D101
@@ -462,4 +679,57 @@ class BigQueryValueCheckOperatorAsync(BigQueryValueCheckOperator):  # noqa: D101
             "%s completed with response %s ",
             self.task_id,
             event["message"],
+        )
+    def get_openlineage_facets_on_complete(self, task_instance):
+        """Returns the lineage data for BigQueryInsertJobOperatorAsync"""
+        from openlineage.airflow.extractors.base import OperatorLineage
+        from openlineage.client.facet import (
+            BaseFacet,
+            OutputStatisticsOutputDatasetFacet,
+            SqlJobFacet,
+        )
+        from openlineage.client.run import Dataset as OpenlineageDataset
+        from openlineage.common.utils import get_from_nullable_chain
+
+        run_facets: dict[str, BaseFacet] = {}
+        job_facets = {"sql": SqlJobFacet(query=self.sql)}
+        input_dataset: list[OpenlineageDataset] = []
+        output_dataset: list[OpenlineageDataset] = []
+        job_id = task_instance.xcom_pull(task_ids=task_instance.task_id, key="job_id")
+        hook = BigQueryHook(
+            gcp_conn_id=self.gcp_conn_id,
+            impersonation_chain=self.impersonation_chain,
+        )
+        job = hook.get_job(job_id=job_id)
+        props = job._properties
+
+        dataset_id = props["configuration"]["destinationTable"]["datasetId"]
+        table_id = props["configuration"]["destinationTable"]["tableId"]
+        openlineage_dataset_namespace = hook.get_uri()
+        openlineage_dataset_name = f".{dataset_id}.{table_id}"
+        stages = get_from_nullable_chain(props, ["statistics", "query", "queryPlan"])
+        output = stages[-1]
+        out_rows = output.get("recordsWritten", 0)
+        out_bytes = output.get("shuffleOutputBytes", 0)
+        input_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={},
+            )
+        ]
+        output_dataset = [
+            OpenlineageDataset(
+                namespace=openlineage_dataset_namespace,
+                name=openlineage_dataset_name,
+                facets={
+                    "outputStatistics": OutputStatisticsOutputDatasetFacet(
+                        rowCount=out_rows,
+                        size=out_bytes,
+                    ),
+                },
+            )
+        ]
+        return OperatorLineage(
+            inputs=input_dataset, outputs=output_dataset, run_facets=run_facets, job_facets=job_facets
         )
